@@ -4,7 +4,7 @@ import { ShoppingBag, Search, Menu, X, User, LogOut, LayoutDashboard, Sun, Moon 
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { categoryApi } from '../api';
+import { categoryApi, settingsApi } from '../api';
 
 const UserNavbar = () => {
   const { cartCount, toggleCart } = useCart();
@@ -13,10 +13,16 @@ const UserNavbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [categories, setCategories] = useState([]);
+  const [logoUrl, setLogoUrl] = useState(null);
+  const [companyName, setCompanyName] = useState('VESTRA');
   const navigate = useNavigate();
 
   useEffect(() => {
     categoryApi.list().then(setCategories).catch(() => { });
+    settingsApi.getPublic().then(s => {
+      if (s?.app_logo) setLogoUrl(s.app_logo);
+      if (s?.company_name) setCompanyName(s.company_name);
+    }).catch(() => {});
   }, []);
 
   const handleSearch = (e) => {
@@ -35,7 +41,11 @@ const UserNavbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           <Link to="/" className="flex-shrink-0 flex items-center">
-            <span className="font-bold text-2xl tracking-[0.2em] text-ink transition-colors duration-300">VESTRA<span className="text-accent">.</span></span>
+            {logoUrl ? (
+              <img src={logoUrl} alt={companyName} className="h-8 w-auto object-contain" />
+            ) : (
+              <span className="font-bold text-2xl tracking-[0.2em] text-ink transition-colors duration-300">{companyName.toUpperCase()}<span className="text-accent">.</span></span>
+            )}
           </Link>
 
           <nav className="hidden md:flex space-x-8 items-center">

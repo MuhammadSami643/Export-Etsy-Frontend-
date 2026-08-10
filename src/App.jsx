@@ -14,6 +14,22 @@ function App() {
     setGlobalNavigate(navigate);
   }, [navigate]);
 
+  useEffect(() => {
+    import('./api').then(({ settingsApi }) => {
+      settingsApi.getPublic().then(s => {
+        if (s?.app_favicon) {
+          let link = document.querySelector("link[rel~='icon']");
+          if (!link) {
+            link = document.createElement('link');
+            link.rel = 'icon';
+            document.head.appendChild(link);
+          }
+          link.href = s.app_favicon;
+        }
+      }).catch(() => {});
+    });
+  }, []);
+
   useTracker();
 
   return (

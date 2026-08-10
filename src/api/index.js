@@ -31,9 +31,9 @@ export const productApi = {
     [...files].forEach((f) => fd.append('detail_images', f));
     return apiFetch(`/products/${id}/detail-images`, { method: 'POST', body: fd, auth: true });
   },
-  setMainImage: (imageId) => apiFetch(`/images/${imageId}/main`, { method: 'PUT', auth: true }),
-  updateImagePrice: (imageId, price) => apiFetch(`/images/${imageId}/price`, { method: 'PUT', body: { price }, auth: true }),
-  removeImage: (imageId) => apiFetch(`/images/${imageId}`, { method: 'DELETE', auth: true }),
+  setMainImage: (imageId) => apiFetch(`/products/images/${imageId}/main`, { method: 'PUT', auth: true }),
+  updateImagePrice: (imageId, price) => apiFetch(`/products/images/${imageId}/price`, { method: 'PUT', body: { price }, auth: true }),
+  removeImage: (imageId) => apiFetch(`/products/images/${imageId}`, { method: 'DELETE', auth: true }),
 };
 
 export const categoryApi = {

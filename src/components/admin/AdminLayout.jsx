@@ -15,6 +15,7 @@ const nav = [
   { to: '/admin/settings', label: 'Settings', icon: Settings },
   { to: '/admin/messages', label: 'Messages', icon: MessageCircle },
   { to: '/admin/size-guides', label: 'Size Guides', icon: Ruler },
+  { to: '/admin/testimonials', label: 'Testimonials', icon: MessageCircle },
 ];
 
 const AdminLayout = ({ children }) => {

@@ -12,6 +12,8 @@ import AdminCustomers from '../pages/admin/AdminCustomers';
 import AdminSettings from '../pages/admin/AdminSettings';
 import AdminMessages from '../pages/admin/AdminMessages';
 import AdminSizeGuide from '../pages/admin/AdminSizeGuide';
+import AdminTestimonials from '../pages/admin/AdminTestimonials';
+import TestimonialForm from '../pages/admin/TestimonialForm';
 import { NotFound, ServerError, Unauthorized, Forbidden, BadRequest } from '../pages/errors';
 
 const AdminRoutes = () => {
@@ -38,6 +40,9 @@ const AdminRoutes = () => {
         <Route path="size-guides" element={<AdminSizeGuide />} />
         <Route path="settings" element={<AdminSettings />} />
          <Route path="messages" element={<AdminMessages />} />
+         <Route path="testimonials" element={<AdminTestimonials />} />
+         <Route path="testimonials/new" element={<TestimonialForm />} />
+         <Route path="testimonials/:id/edit" element={<TestimonialForm />} />
          <Route path="401" element={<Unauthorized homePath="/admin" loginPath="/admin/login" />} />
          <Route path="403" element={<Forbidden homePath="/admin" />} />
          <Route path="400" element={<BadRequest homePath="/admin" />} />

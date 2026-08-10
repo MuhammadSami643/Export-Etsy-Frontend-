@@ -9,6 +9,8 @@ const AdminSettings = () => {
     company_name: '',
     app_logo: '',
     app_logo_file: null,
+    app_favicon: '',
+    app_favicon_file: null,
     tagline: '',
     intro: '',
     phone: '',
@@ -49,6 +51,8 @@ const AdminSettings = () => {
           company_name: s.company_name || '',
           app_logo: s.app_logo || '',
           app_logo_file: null,
+          app_favicon: s.app_favicon || '',
+          app_favicon_file: null,
           tagline: s.tagline || '',
           intro: s.intro || '',
           phone: s.phone || '',
@@ -96,8 +100,10 @@ const AdminSettings = () => {
       setForm((f) => ({
         ...f,
         app_logo: updated.app_logo || '',
+        app_favicon: updated.app_favicon || '',
         hero_bg: updated.hero_bg || '',
         app_logo_file: null,
+        app_favicon_file: null,
         hero_bg_file: null,
       }));
       setSaved(true);
@@ -148,6 +154,15 @@ const AdminSettings = () => {
           {form.app_logo && (
             <div className="mt-2">
               <img src={form.app_logo} alt="App logo" className="h-16 w-auto object-contain rounded border border-gray-200 p-2 bg-gray-50" />
+            </div>
+          )}
+          <F label="App Favicon URL"><input value={form.app_favicon} onChange={setField('app_favicon')} className={input} placeholder="https://..." /></F>
+          <F label="Upload App Favicon (.ico, .png, etc.)">
+            <input type="file" onChange={setFile('app_favicon_file')} className={input} accept="image/*" />
+          </F>
+          {form.app_favicon && (
+            <div className="mt-2">
+              <img src={form.app_favicon} alt="App favicon" className="h-10 w-10 object-contain rounded border border-gray-200 p-2 bg-gray-50" />
             </div>
           )}
           <F label="Tagline"><input value={form.tagline} onChange={setField('tagline')} className={input} /></F>

@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ArrowLeft, X, Upload, Star } from 'lucide-react';
-import { productApi, categoryApi } from '../../api';
+import { productApi, categoryApi, adminSizeGuideApi } from '../../api';
 import { assetUrl } from '../../api/client';
 import { useAdminTitle } from '../../components/admin/useAdminTitle';
 
 const empty = {
   name: '', description: '', price: '', sku: '', material: '',
-  sizes: '', colors: '', stock: 0, main_category_id: '', sub_category_id: '', featured: false, active: true,
+  sizes: '', colors: '', stock: 0, main_category_id: '', sub_category_id: '', featured: false, active: true, size_guide_id: ''
 };
 
 const ProductForm = () => {
@@ -23,12 +23,17 @@ const ProductForm = () => {
   const [detailFiles, setDetailFiles] = useState([]);
   const [detailPreviews, setDetailPreviews] = useState([]);
   const [detailPrices, setDetailPrices] = useState({});
+  const [sizeGuides, setSizeGuides] = useState([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    categoryApi.listWithSubs().then((cats) => {
+    Promise.all([
+      categoryApi.listWithSubs(),
+      adminSizeGuideApi.list().catch(() => []) // fetch size guides
+    ]).then(([cats, guides]) => {
       setCategories(cats);
+      setSizeGuides(guides);
       if (isEdit) {
         productApi.get(id).then((p) => {
           let mainCatId = '';
@@ -57,6 +62,7 @@ const ProductForm = () => {
             sub_category_id: subCatId,
             featured: !!p?.featured,
             active: !!p?.active,
+            size_guide_id: p?.size_guide_id || ''
           });
           setExistingImages(p?.images || []);
           const main = (p?.images || []).find((i) => i.is_main);
@@ -124,6 +130,7 @@ const ProductForm = () => {
         price: parseFloat(form.price) || 0,
         stock: parseInt(form.stock, 10) || 0,
         category_id: form.sub_category_id || form.main_category_id || null,
+        size_guide_id: form.size_guide_id || null,
         sizes: typeof form.sizes === 'string' ? form.sizes.split(',').map((s) => s.trim()).filter(Boolean) : form.sizes,
         colors: typeof form.colors === 'string' ? form.colors.split(',').map((c) => c.trim()).filter(Boolean) : form.colors,
         sku: form.sku || undefined,
@@ -216,10 +223,20 @@ const ProductForm = () => {
             <label className={label}>Material</label>
             <input value={form.material} onChange={set('material')} className={input} placeholder="e.g. 100% Cotton" />
           </div>
+          <div>
+            <label className={label}>Size Guide</label>
+            <select value={form.size_guide_id} onChange={set('size_guide_id')} className={input}>
+              <option value="">— Inherit from Category or None —</option>
+              {sizeGuides.map((sg) => (
+                <option key={sg.id} value={sg.id}>{sg.title}</option>
+              ))}
+            </select>
+          </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className={label}>Sizes (comma-separated)</label>
               <input value={form.sizes} onChange={set('sizes')} className={input} placeholder="S, M, L, XL" />
+              <p className="text-xs text-gray-400 mt-1">Leave blank to auto-extract from Size Guide.</p>
             </div>
             <div>
               <label className={label}>Colors (comma-separated)</label>

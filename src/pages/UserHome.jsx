@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import { productApi, categoryApi, settingsApi } from '../api';
-import { assetUrl } from '../api/client';
+import { apiFetch, assetUrl } from '../api/client';
 
 const heroImg = 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=2000&h=1000&fit=crop';
 const catImg = {
@@ -16,11 +16,13 @@ const UserHome = () => {
   const [featured, setFeatured] = useState([]);
   const [categories, setCategories] = useState([]);
   const [settings, setSettings] = useState(null);
+  const [testimonials, setTestimonials] = useState([]);
 
   useEffect(() => {
     productApi.list({ featured: true, limit: 4 }).then((d) => setFeatured(d.products)).catch(() => { });
     categoryApi.listWithSubs().then(setCategories).catch(() => { });
     settingsApi.get().then(setSettings).catch(() => { });
+    apiFetch('/testimonials').then(setTestimonials).catch(() => { });
   }, []);
 
   const heroTitle = settings?.hero_title || 'Wear the standard\nyou\'re proud of.';
@@ -83,7 +85,7 @@ const UserHome = () => {
                   className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:rotate-1 opacity-80 group-hover:opacity-100"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/20 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-300" />
-                
+
                 <div className="absolute inset-0 p-8 flex flex-col justify-end translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                   <div className="w-10 h-1 bg-accent rounded-full mb-4 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
                   <h3 className="text-3xl font-extrabold text-white mb-3 drop-shadow-md">{c.name}</h3>
@@ -142,66 +144,70 @@ const UserHome = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className="text-accent font-semibold tracking-[0.2em] text-xs uppercase">Reviews</span>
-            <h2 className="text-3xl font-bold tracking-tight text-ink mt-2">What They're Saying</h2>
+            <h2 className="text-3xl font-bold tracking-tight text-ink mt-2 mb-2">What Our Customers Say</h2>
+            <p className="text-muted">We place huge value on strong relationships and customer feedback.</p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Testimonial 1 */}
-            <div className="bg-white p-10 rounded-[2rem] shadow-sm border border-gray-100 hover:shadow-lg hover:border-gray-200 transition-all duration-300">
-              <div className="text-accent mb-6 flex gap-1">
-                {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-5 h-5 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
-                ))}
-              </div>
-              <p className="text-gray-600 font-medium leading-relaxed mb-8 italic">"The export quality is immediately noticeable. Every seam, every cut feels meticulously planned. Easily the best pieces in my wardrobe right now."</p>
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-gray-200 rounded-full overflow-hidden">
-                  <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop" alt="Customer" className="w-full h-full object-cover" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-4 pb-12">
+            {(testimonials.length > 0 ? testimonials : [
+              {
+                id: '1',
+                subject: 'Amazing quality!',
+                content: "I used to spend hours writing creative copy, but now all I do is tell Rytr what I need and it writes everything for me. It's the ultimate AI content writer, and a must-have tool for bloggers,marketers.",
+                name: 'MERI PIPENBAHER',
+                role: 'Ui Designer',
+                image_url: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop'
+              },
+              {
+                id: '2',
+                subject: 'Saves so much time',
+                content: "codexyard is a game-changer. Instead of drowning in an endless chain of emails, there is clear and easy accountability meaning tasks actually get done!",
+                name: 'SAM WISTER',
+                role: 'Laravel Developer',
+                image_url: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop'
+              },
+              {
+                id: '3',
+                subject: 'Highly recommended',
+                content: "I have been using codexyard for over a year now and I love it! I can't imagine life without it. It's so easy to use, and the customer service is great.",
+                name: 'EMILA MARTINEZ',
+                role: 'Social Media Manager',
+                image_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&h=150&fit=crop'
+              }
+            ]).map((t) => (
+              <div key={t.id} className="bg-white p-10 rounded-xl shadow-sm border border-gray-100 hover:shadow-lg hover:border-gray-200 relative text-center mb-12 md:mb-0 flex flex-col h-full transition-all duration-300">
+                <div className="text-accent mb-4 flex justify-center">
+                  <svg className="w-12 h-12 fill-current opacity-20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
+                  </svg>
                 </div>
-                <div>
-                  <h4 className="font-bold text-ink text-sm">Marcus L.</h4>
-                  <p className="text-xs text-gray-500 uppercase tracking-widest mt-0.5">Verified Buyer</p>
+                {t.subject && (
+                  <h4 className="font-bold text-ink mb-2">{t.subject}</h4>
+                )}
+                <p className="text-gray-600 text-[15px] leading-relaxed mb-8 flex-grow">
+                  "{t.content}"
+                </p>
+                
+                <div className="mt-auto mb-4">
+                  <h4 className="font-bold text-accent text-sm uppercase tracking-wider mb-1">{t.name}</h4>
+                  <p className="text-slate-500 text-sm">{t.role}</p>
                 </div>
-              </div>
-            </div>
 
-            {/* Testimonial 2 */}
-            <div className="bg-white p-10 rounded-[2rem] shadow-sm border border-gray-100 hover:shadow-lg hover:border-gray-200 transition-all duration-300">
-              <div className="text-accent mb-6 flex gap-1">
-                {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-5 h-5 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
-                ))}
-              </div>
-              <p className="text-gray-600 font-medium leading-relaxed mb-8 italic">"I've bought from many high-end brands, but the fabric feel and structure here is unparalleled. Shipping was incredibly fast globally."</p>
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-gray-200 rounded-full overflow-hidden">
-                  <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop" alt="Customer" className="w-full h-full object-cover" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-ink text-sm">Sarah J.</h4>
-                  <p className="text-xs text-gray-500 uppercase tracking-widest mt-0.5">Verified Buyer</p>
+                <div className="absolute -bottom-10 left-1/2 transform -translate-x-1/2">
+                  {t.image_url ? (
+                    <img 
+                      src={assetUrl(t.image_url)} 
+                      alt={t.name} 
+                      className="w-20 h-20 rounded-full border-[6px] border-white object-cover shadow-sm bg-gray-100"
+                    />
+                  ) : (
+                    <div className="w-20 h-20 rounded-full border-[6px] border-white flex items-center justify-center text-gray-500 bg-gray-100 shadow-sm uppercase font-bold text-2xl">
+                      {t.name.charAt(0)}
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
-
-            {/* Testimonial 3 */}
-            <div className="bg-white p-10 rounded-[2rem] shadow-sm border border-gray-100 hover:shadow-lg hover:border-gray-200 transition-all duration-300">
-              <div className="text-accent mb-6 flex gap-1">
-                {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-5 h-5 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
-                ))}
-              </div>
-              <p className="text-gray-600 font-medium leading-relaxed mb-8 italic">"A standard they can truly be proud of. The minimalist aesthetic combined with heavy-duty material makes for perfect everyday wear."</p>
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-gray-200 rounded-full overflow-hidden">
-                  <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop" alt="Customer" className="w-full h-full object-cover" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-ink text-sm">David K.</h4>
-                  <p className="text-xs text-gray-500 uppercase tracking-widest mt-0.5">Verified Buyer</p>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>

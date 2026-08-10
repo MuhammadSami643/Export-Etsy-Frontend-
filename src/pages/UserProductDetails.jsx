@@ -16,6 +16,7 @@ const UserProductDetails = () => {
   const [color, setColor] = useState(null);
   const [isAdded, setIsAdded] = useState(false);
   const [error, setError] = useState(null);
+  const [showSizeGuide, setShowSizeGuide] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -25,7 +26,8 @@ const UserProductDetails = () => {
         setProduct(p);
         const mainImg = (p.images || []).find((i) => i.is_main);
         setActiveImg(mainImg ? assetUrl(mainImg.url) : productImage(p));
-        setSize(p.sizes?.[0] || null);
+        const derivedSizes = p.sizes?.length > 0 ? p.sizes : (p.size_guide ? p.size_guide.rows.map(r => r[0]) : []);
+        setSize(derivedSizes[0] || null);
         setColor(p.colors?.[0] || null);
       })
       .catch(() => setError('Product not found'))
@@ -177,26 +179,37 @@ const UserProductDetails = () => {
             )}
 
             {/* Sizes */}
-            {product.sizes?.length > 0 && (
-              <div className="mb-6">
-                <div className="flex justify-between items-center mb-3">
-                  <p className="text-sm font-semibold text-ink">Size</p>
-                  <Link to="/size-guide" className="text-xs text-gray-500 hover:text-ink underline">Size Guide</Link>
+            {(product.sizes?.length > 0 || product.size_guide) && (() => {
+              const displaySizes = product.sizes?.length > 0 ? product.sizes : (product.size_guide ? product.size_guide.rows.map(r => r[0]) : []);
+              return displaySizes.length > 0 ? (
+                <div className="mb-6">
+                  <div className="flex justify-between items-center mb-3">
+                    <p className="text-sm font-semibold text-ink">Size</p>
+                    {product.size_guide ? (
+                      <button 
+                        onClick={() => setShowSizeGuide(true)} 
+                        className="text-xs text-gray-500 hover:text-ink underline"
+                      >
+                        Size Guide
+                      </button>
+                    ) : (
+                      <Link to="/size-guide" className="text-xs text-gray-500 hover:text-ink underline">Size Guide</Link>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    {displaySizes.map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => setSize(s)}
+                        className={`w-12 h-12 rounded-lg font-medium text-sm transition-colors ${size === s ? 'bg-ink text-white' : 'border border-gray-200 bg-white text-gray-600 hover:border-ink'}`}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-3">
-                  {product.sizes.map((s) => (
-                    <button
-                      key={s}
-                      onClick={() => setSize(s)}
-                      className={`w-12 h-12 rounded-lg font-medium text-sm transition-colors ${size === s ? 'bg-ink text-white' : 'border border-gray-200 bg-white text-gray-600 hover:border-ink'
-                        }`}
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+              ) : null;
+            })()}
 
             {/* Colors */}
             {product.colors?.length > 0 && (
@@ -254,6 +267,48 @@ const UserProductDetails = () => {
           </div>
         </div>
       </div>
+
+      {showSizeGuide && product.size_guide && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm" onClick={() => setShowSizeGuide(false)}>
+          <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative" onClick={e => e.stopPropagation()}>
+            <button 
+              onClick={() => setShowSizeGuide(false)}
+              className="absolute top-4 right-4 p-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <div className="p-8">
+              <h3 className="text-2xl font-bold text-ink mb-6 uppercase tracking-wider text-sm text-center">{product.size_guide.title || 'Size Guide'}</h3>
+              <div className="overflow-x-auto border border-gray-200 rounded-lg">
+                <table className="w-full text-center border-collapse">
+                  <thead>
+                    <tr className="bg-gray-50 text-ink text-sm uppercase tracking-wider">
+                      {product.size_guide.columns?.map((col, cIdx) => (
+                        <th key={cIdx} className={`py-4 px-4 font-bold border-b border-gray-200 ${cIdx > 0 ? 'border-l border-gray-200' : ''}`}>
+                          {col}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 text-gray-600">
+                    {product.size_guide.rows?.map((row, rIdx) => (
+                      <tr key={rIdx} className={rIdx % 2 !== 0 ? 'bg-gray-50/50' : ''}>
+                        {row.map((cell, cIdx) => (
+                          <td key={cIdx} className={`py-4 px-4 ${cIdx === 0 ? 'font-medium text-ink' : 'border-l border-gray-200'}`}>
+                            {cell}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

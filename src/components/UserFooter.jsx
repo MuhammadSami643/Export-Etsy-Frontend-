@@ -1,19 +1,41 @@
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { settingsApi } from '../api';
 
 const UserFooter = () => {
+  const [logoUrl, setLogoUrl] = useState(null);
+  const [companyName, setCompanyName] = useState('VESTRA');
+  const [socials, setSocials] = useState({});
+
+  useEffect(() => {
+    settingsApi.getPublic().then(s => {
+      if (s?.app_logo) setLogoUrl(s.app_logo);
+      if (s?.company_name) setCompanyName(s.company_name);
+      setSocials({
+        ig: s?.instagram || '#',
+        tw: s?.twitter || '#',
+        fb: s?.facebook || '#',
+      });
+    }).catch(() => {});
+  }, []);
+
   return (
     <footer className="bg-white border-t border-gray-100 pt-16 pb-8 mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div>
-            <span className="font-bold text-2xl tracking-[0.2em] text-ink block mb-4">VESTRA<span className="text-accent">.</span></span>
+            {logoUrl ? (
+              <img src={logoUrl} alt={companyName} className="h-10 w-auto object-contain mb-4 block" />
+            ) : (
+              <span className="font-bold text-2xl tracking-[0.2em] text-ink block mb-4">{companyName.toUpperCase()}<span className="text-accent">.</span></span>
+            )}
             <p className="text-gray-500 text-sm mb-6 max-w-xs">
               Global apparel export. Thoughtfully made clothing for men, women and kids — shipped worldwide.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-sm font-bold text-gray-400 hover:text-accent transition-colors">IG</a>
-              <a href="#" className="text-sm font-bold text-gray-400 hover:text-accent transition-colors">TW</a>
-              <a href="#" className="text-sm font-bold text-gray-400 hover:text-accent transition-colors">FB</a>
+              <a href={socials.ig} target="_blank" rel="noreferrer" className="text-sm font-bold text-gray-400 hover:text-accent transition-colors">IG</a>
+              <a href={socials.tw} target="_blank" rel="noreferrer" className="text-sm font-bold text-gray-400 hover:text-accent transition-colors">TW</a>
+              <a href={socials.fb} target="_blank" rel="noreferrer" className="text-sm font-bold text-gray-400 hover:text-accent transition-colors">FB</a>
             </div>
           </div>
 
