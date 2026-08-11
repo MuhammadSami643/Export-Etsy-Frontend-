@@ -1,22 +1,26 @@
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { settingsApi } from '../api';
+import { settingsApi, categoryApi } from '../api';
 
 const UserFooter = () => {
   const [logoUrl, setLogoUrl] = useState(null);
   const [companyName, setCompanyName] = useState('VESTRA');
-  const [socials, setSocials] = useState({});
+  const [socials, setSocials] = useState([]);
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
     settingsApi.getPublic().then(s => {
       if (s?.app_logo) setLogoUrl(s.app_logo);
       if (s?.company_name) setCompanyName(s.company_name);
-      setSocials({
-        ig: s?.instagram || '#',
-        tw: s?.twitter || '#',
-        fb: s?.facebook || '#',
-      });
+      
+      let parsedSocials = [];
+      if (s?.social_links) {
+        parsedSocials = typeof s.social_links === 'string' ? JSON.parse(s.social_links) : s.social_links;
+      }
+      setSocials(parsedSocials);
     }).catch(() => {});
+    
+    categoryApi.listWithSubs().then(setCategories).catch(() => {});
   }, []);
 
   return (
@@ -32,10 +36,12 @@ const UserFooter = () => {
             <p className="text-gray-500 text-sm mb-6 max-w-xs">
               Global apparel export. Thoughtfully made clothing for men, women and kids — shipped worldwide.
             </p>
-            <div className="flex space-x-4">
-              <a href={socials.ig} target="_blank" rel="noreferrer" className="text-sm font-bold text-gray-400 hover:text-accent transition-colors">IG</a>
-              <a href={socials.tw} target="_blank" rel="noreferrer" className="text-sm font-bold text-gray-400 hover:text-accent transition-colors">TW</a>
-              <a href={socials.fb} target="_blank" rel="noreferrer" className="text-sm font-bold text-gray-400 hover:text-accent transition-colors">FB</a>
+            <div className="flex flex-wrap gap-4">
+              {socials.map((social, idx) => (
+                <a key={idx} href={social.url} target="_blank" rel="noreferrer" className="text-sm font-bold text-gray-400 hover:text-accent transition-colors">
+                  {social.label.toUpperCase()}
+                </a>
+              ))}
             </div>
           </div>
 
@@ -43,10 +49,11 @@ const UserFooter = () => {
             <h4 className="font-semibold text-ink mb-4">Shop</h4>
             <ul className="space-y-3">
               <li><Link to="/products" className="text-gray-500 hover:text-accent text-sm transition-colors">All Products</Link></li>
-              <li><Link to="/products?category=men" className="text-gray-500 hover:text-accent text-sm transition-colors">Men</Link></li>
-              <li><Link to="/products?category=women" className="text-gray-500 hover:text-accent text-sm transition-colors">Women</Link></li>
-              <li><Link to="/products?category=kids" className="text-gray-500 hover:text-accent text-sm transition-colors">Kids</Link></li>
-              <li><Link to="/products?category=accessories" className="text-gray-500 hover:text-accent text-sm transition-colors">Accessories</Link></li>
+              {categories.filter(c => !c.parent_id).map(c => (
+                <li key={c.id}>
+                  <Link to={`/products?category=${c.slug}`} className="text-gray-500 hover:text-accent text-sm transition-colors">{c.name}</Link>
+                </li>
+              ))}
             </ul>
           </div>
 

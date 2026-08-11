@@ -1,6 +1,6 @@
 import { NavLink, Outlet, Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { LayoutDashboard, Package, Tags, ShoppingCart, LogOut, Store, Settings, MessageCircle, Users, Sun, Moon, Ruler } from 'lucide-react';
+import { LayoutDashboard, Package, Tags, ShoppingCart, LogOut, Store, Settings, MessageCircle, Users, Sun, Moon, Ruler, Percent } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import AdminPageTitleContext from './AdminPageTitleContext';
@@ -12,7 +12,9 @@ const nav = [
   { to: '/admin/categories', label: 'Categories', icon: Tags },
   { to: '/admin/orders', label: 'Orders', icon: ShoppingCart },
   { to: '/admin/customers', label: 'Customers', icon: Users },
-  { to: '/admin/settings', label: 'Settings', icon: Settings },
+  { to: '/admin/sales', label: 'Sales & Promos', icon: Percent },
+  { to: '/admin/settings', label: 'General Settings', icon: Settings },
+  { to: '/admin/home-settings', label: 'Home Settings', icon: LayoutDashboard },
   { to: '/admin/messages', label: 'Messages', icon: MessageCircle },
   { to: '/admin/size-guides', label: 'Size Guides', icon: Ruler },
   { to: '/admin/testimonials', label: 'Testimonials', icon: MessageCircle },
@@ -39,7 +41,7 @@ const AdminLayout = ({ children }) => {
             <span className="font-bold text-xl tracking-[0.2em] text-white">VESTRA</span>
             <span className="ml-2 text-xs text-gray-500 uppercase tracking-wider">Admin</span>
           </div>
-          <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto no-scrollbar">
+          <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto minimal-scrollbar">
             {nav.map((item) => (
               <NavLink
                 key={item.to}

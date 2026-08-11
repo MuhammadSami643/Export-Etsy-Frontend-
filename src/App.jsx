@@ -7,6 +7,7 @@ import AdminRoutes from './routes/AdminRoutes';
 import ScrollToTop from './components/ScrollToTop';
 
 import { AuthProvider } from './context/AuthContext';
+import { SalesProvider } from './context/SalesContext';
 
 function App() {
   const navigate = useNavigate();
@@ -37,7 +38,7 @@ function App() {
       <ScrollToTop />
       <Routes>
         <Route path="/admin/*" element={<AuthProvider key="admin"><AdminRoutes /></AuthProvider>} />
-        <Route path="/*" element={<AuthProvider key="user"><UserRoutes /></AuthProvider>} />
+        <Route path="/*" element={<AuthProvider key="user"><SalesProvider><UserRoutes /></SalesProvider></AuthProvider>} />
       </Routes>
     </>
   );

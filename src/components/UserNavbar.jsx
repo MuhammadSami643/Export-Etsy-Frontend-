@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingBag, Search, Menu, X, User, LogOut, LayoutDashboard, Sun, Moon } from 'lucide-react';
+import { ShoppingBag, Search, Menu, X, User, LogOut, LayoutDashboard, Sun, Moon, ChevronDown } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
@@ -48,9 +48,44 @@ const UserNavbar = () => {
             )}
           </Link>
 
-          <nav className="hidden md:flex space-x-8 items-center">
+          <nav className="hidden md:flex space-x-8 items-center h-full">
             <Link to="/" className="text-gray-600 hover:text-accent font-medium transition-colors">Home</Link>
-            <Link to="/products" className="text-gray-600 hover:text-accent font-medium transition-colors">Shop All</Link>
+            
+            <div className="relative group h-full flex items-center">
+              <Link to="/products" className="text-gray-600 group-hover:text-accent font-medium transition-colors flex items-center gap-1 h-full">
+                Shop All <ChevronDown className="h-4 w-4 transition-transform duration-300 group-hover:rotate-180" />
+              </Link>
+              
+              <div className="absolute top-[80px] left-1/2 -translate-x-1/2 w-[600px] bg-white shadow-2xl shadow-black/10 border border-gray-100 rounded-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top -translate-y-2 group-hover:translate-y-0 z-50">
+                <div className="p-8 grid grid-cols-2 gap-8">
+                  <div>
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-5">Categories</h3>
+                    <ul className="space-y-4">
+                      {safeCategories.filter(c => !c.parent_id).slice(0, 5).map(cat => (
+                        <li key={cat.id}>
+                          <Link to={`/products?category=${cat.slug}`} className="text-gray-700 hover:text-accent font-medium transition-colors flex items-center justify-between group/link text-sm">
+                            {cat.name}
+                            <span className="opacity-0 group-hover/link:opacity-100 transform -translate-x-2 group-hover/link:translate-x-0 transition-all text-accent">→</span>
+                          </Link>
+                        </li>
+                      ))}
+                      <li className="pt-2">
+                        <Link to="/products" className="text-accent font-bold text-sm hover:underline inline-block">View All Categories</Link>
+                      </li>
+                    </ul>
+                  </div>
+                  <div className="bg-[#F7F5F0] rounded-xl p-6 flex flex-col justify-center items-center text-center">
+                    <span className="bg-[#BA9B74] text-white text-[10px] font-bold px-3 py-1 rounded-full mb-4 uppercase tracking-wider">Featured</span>
+                    <h4 className="font-bold text-xl text-ink mb-2">New Arrivals</h4>
+                    <p className="text-sm text-gray-500 mb-6 leading-relaxed">Discover the latest additions to our premium collection.</p>
+                    <Link to="/products?sort=newest" className="bg-[#BA9B74] text-white px-6 py-2.5 rounded-full text-sm font-bold tracking-widest hover:bg-[#A68A61] transition-colors">
+                      SHOP NOW
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <Link to="/about" className="text-gray-600 hover:text-accent font-medium transition-colors">About</Link>
             <Link to="/contact" className="text-gray-600 hover:text-accent font-medium transition-colors">Contact</Link>
           </nav>

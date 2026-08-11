@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Truck, ShieldCheck, Award, Gem } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import { productApi, categoryApi, settingsApi } from '../api';
 import { apiFetch, assetUrl } from '../api/client';
+import { useSales } from '../context/SalesContext';
 
 const heroImg = 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=2000&h=1000&fit=crop';
 const catImg = {
@@ -14,16 +16,32 @@ const catImg = {
 
 const UserHome = () => {
   const [featured, setFeatured] = useState([]);
+  const [heroProducts, setHeroProducts] = useState([]);
+  const [currentHeroIdx, setCurrentHeroIdx] = useState(0);
   const [categories, setCategories] = useState([]);
   const [settings, setSettings] = useState(null);
   const [testimonials, setTestimonials] = useState([]);
+  const { activeSales, getCategorySale } = useSales();
+  
+  // Form State for Inquiry
+  const [inquiry, setInquiry] = useState({ name: '', email: '', message: '' });
+  const [inquiryStatus, setInquiryStatus] = useState('');
 
   useEffect(() => {
     productApi.list({ featured: true, limit: 4 }).then((d) => setFeatured(d.products)).catch(() => { });
+    productApi.list({ show_in_hero: true, limit: 5 }).then((d) => setHeroProducts(d.products)).catch(() => { });
     categoryApi.listWithSubs().then(setCategories).catch(() => { });
     settingsApi.get().then(setSettings).catch(() => { });
     apiFetch('/testimonials').then(setTestimonials).catch(() => { });
   }, []);
+
+  useEffect(() => {
+    if (heroProducts.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentHeroIdx((prev) => (prev + 1) % heroProducts.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [heroProducts.length]);
 
   const heroTitle = settings?.hero_title || 'Wear the standard\nyou\'re proud of.';
   const heroSubtitle = settings?.hero_subtitle || 'Responsibly sourced, precisely cut apparel built to last. Discover pieces designed to move with you.';
@@ -31,42 +49,179 @@ const UserHome = () => {
   const heroLink = settings?.cta_link || '/products';
   const heroImage = settings?.hero_bg || heroImg;
 
+  // Find a global sale or any sale with a banner
+  const saleBanner = activeSales.find(s => s.banner_image_url || s.banner_title);
+
+  const handleInquiry = async (e) => {
+    e.preventDefault();
+    setInquiryStatus('sending');
+    try {
+      await apiFetch('/contact', { method: 'POST', body: JSON.stringify(inquiry) });
+      setInquiryStatus('success');
+      setInquiry({ name: '', email: '', message: '' });
+    } catch(err) {
+      setInquiryStatus('error');
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero */}
-      <section className="relative h-[85vh] min-h-[560px] flex items-center overflow-hidden bg-ink">
-        <div className="absolute inset-0 w-full h-full">
-          <img src={heroImage} alt="VESTRA Apparel" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/40 to-transparent" />
+      <section className="relative h-[85vh] min-h-[600px] flex items-center overflow-hidden bg-white">
+
+        
+        <div className="relative max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 h-full pt-16 pb-16 z-10">
+          {heroProducts.length > 0 ? (
+            <div className="grid grid-cols-1 lg:grid-cols-2 h-full items-center gap-8">
+              {/* Text Column */}
+              <div className="max-w-xl z-10 pl-0 lg:pl-10">
+                <span className="inline-block bg-[#EBE7DF] text-[#A68A61] font-bold tracking-[0.05em] text-[11px] uppercase px-3 py-1.5 mb-6">
+                  NEW ARRIVAL...
+                </span>
+                <h1 className="text-5xl sm:text-6xl lg:text-[5rem] font-bold tracking-tight text-[#2D2D2D] leading-[1.05] mb-6 whitespace-pre-line">
+                  {heroTitle}
+                </h1>
+                <p className="text-[15px] text-[#7A7A7A] leading-[1.7] mb-10 max-w-[400px]">
+                  {heroSubtitle}
+                </p>
+                <div className="flex flex-wrap items-center gap-4">
+                  <Link
+                    to={`/products/${heroProducts[currentHeroIdx].slug}`}
+                    className="inline-flex items-center bg-[#BA9B74] text-white px-8 py-3.5 rounded-full font-medium text-[13px] tracking-widest hover:bg-[#A68A61] transition-all shadow-sm hover:shadow-md"
+                  >
+                    {heroCta.toUpperCase()}
+                  </Link>
+                  <Link
+                    to={`/products/${heroProducts[currentHeroIdx].slug}`}
+                    className="inline-flex items-center text-[#BA9B74] bg-white px-8 py-3.5 rounded-full border border-[#BA9B74] font-medium text-[13px] tracking-widest hover:bg-[#BA9B74]/10 transition-all"
+                  >
+                    VIEW DETAILS
+                  </Link>
+                </div>
+              </div>
+
+              {/* Product Column */}
+              <div className="relative h-full flex items-center justify-center mt-10 lg:mt-0">
+                
+                <div className="relative w-[380px] h-[380px] md:w-[500px] md:h-[500px] bg-[#E1D0BC] rounded-full overflow-hidden flex items-center justify-center z-10 shadow-xl">
+                  {heroProducts[currentHeroIdx].images && heroProducts[currentHeroIdx].images.length > 0 ? (
+                    <img 
+                      key={heroProducts[currentHeroIdx].id}
+                      src={assetUrl(heroProducts[currentHeroIdx].images.find(i => i.is_main)?.url || heroProducts[currentHeroIdx].images[0].url)} 
+                      alt={heroProducts[currentHeroIdx].name} 
+                      className="w-full h-full object-contain mix-blend-multiply p-8 transition-transform duration-700 ease-out hover:scale-105"
+                    />
+                  ) : (
+                     <img src={heroImage} alt="Placeholder" className="w-full h-full object-contain mix-blend-multiply p-8" />
+                  )}
+                </div>
+
+                {/* Slider Dots */}
+                {heroProducts.length > 1 && (
+                  <div className="absolute right-0 lg:-right-6 top-1/2 transform -translate-y-1/2 flex flex-col gap-2.5 z-30">
+                    {heroProducts.map((_, idx) => (
+                      <button 
+                        key={idx}
+                        onClick={() => setCurrentHeroIdx(idx)}
+                        className={`w-2 h-2 rounded-full transition-all duration-300 ${idx === currentHeroIdx ? 'bg-[#997F64]' : 'bg-[#D1C6BA] hover:bg-[#A68A61]'}`}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            /* Fallback Hero if no show_in_hero products */
+            <div className="grid grid-cols-1 lg:grid-cols-2 h-full items-center gap-8">
+               <div className="max-w-xl z-10 pl-0 lg:pl-10">
+                <span className="inline-block bg-[#EBE7DF] text-[#A68A61] font-bold tracking-[0.05em] text-[11px] uppercase px-3 py-1.5 mb-6">
+                  NEW ARRIVAL...
+                </span>
+                <h1 className="text-5xl sm:text-6xl lg:text-[5rem] font-bold tracking-tight text-[#2D2D2D] leading-[1.05] mb-6 whitespace-pre-line">
+                  {heroTitle}
+                </h1>
+                <p className="text-[15px] text-[#7A7A7A] leading-[1.7] mb-10 max-w-[400px]">
+                  {heroSubtitle}
+                </p>
+                <div className="flex flex-wrap items-center gap-4">
+                  <Link to={heroLink} className="inline-flex items-center bg-[#BA9B74] text-white px-8 py-3.5 rounded-full font-medium text-[13px] tracking-widest hover:bg-[#A68A61] transition-all shadow-sm hover:shadow-md">
+                    {heroCta.toUpperCase()}
+                  </Link>
+                  <Link to={heroLink} className="inline-flex items-center text-[#BA9B74] bg-white px-8 py-3.5 rounded-full border border-[#BA9B74] font-medium text-[13px] tracking-widest hover:bg-[#BA9B74]/10 transition-all">
+                    VIEW DETAILS
+                  </Link>
+                </div>
+              </div>
+              <div className="relative h-full flex items-center justify-center mt-10 lg:mt-0">
+                <div className="relative w-[380px] h-[380px] md:w-[500px] md:h-[500px] bg-[#E1D0BC] rounded-full overflow-hidden flex items-center justify-center z-10 shadow-xl">
+                  <img src={heroImage} alt="Hero" className="w-full h-full object-cover" />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-        <div className="relative max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-xl">
-            <span className="inline-block text-accent font-semibold tracking-[0.25em] text-xs uppercase mb-5">
-              New Season · 2026
-            </span>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-[1.05] mb-6 whitespace-pre-line">
-              {heroTitle}
-            </h1>
-            <p className="text-lg text-gray-200 font-light leading-relaxed mb-9 max-w-md">
-              {heroSubtitle}
-            </p>
-            <div className="flex flex-wrap items-center gap-4">
-              <Link
-                to={heroLink}
-                className="inline-flex items-center bg-accent text-accent-foreground px-8 py-4 rounded-full font-semibold hover:bg-accent-hover transition-colors shadow-lg shadow-black/20"
-              >
-                {heroCta} <span className="ml-2">→</span>
-              </Link>
-              <Link
-                to="/about"
-                className="inline-flex items-center text-white font-medium px-6 py-4 rounded-full border border-white/30 hover:bg-white/10 transition-colors"
-              >
-                Our Story
-              </Link>
+      </section>
+
+      {/* Features Banner */}
+      <section className="bg-[#F9F8F6] py-16 border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="group bg-white p-8 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center text-center transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-[#BA9B74]/10">
+              <div className="bg-[#F7F5F0] p-5 rounded-full text-[#BA9B74] mb-6 group-hover:scale-110 group-hover:-rotate-12 group-hover:bg-[#BA9B74] group-hover:text-white transition-all duration-500">
+                <Truck className="h-8 w-8" strokeWidth={1.5} />
+              </div>
+              <h3 className="font-extrabold text-gray-900 tracking-widest uppercase text-sm mb-3">{settings?.feature_1_title || 'High-End Stitching'}</h3>
+              <p className="text-[15px] text-gray-500 leading-relaxed max-w-xs">{settings?.feature_1_desc || 'Uncompromising attention to detail in every seam.'}</p>
+            </div>
+            
+            <div className="group bg-white p-8 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center text-center transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-[#BA9B74]/10">
+              <div className="bg-[#F7F5F0] p-5 rounded-full text-[#BA9B74] mb-6 group-hover:scale-110 group-hover:rotate-12 group-hover:bg-[#BA9B74] group-hover:text-white transition-all duration-500">
+                <ShieldCheck className="h-8 w-8" strokeWidth={1.5} />
+              </div>
+              <h3 className="font-extrabold text-gray-900 tracking-widest uppercase text-sm mb-3">{settings?.feature_2_title || 'Premium Fabrics'}</h3>
+              <p className="text-[15px] text-gray-500 leading-relaxed max-w-xs">{settings?.feature_2_desc || 'Responsibly sourced, long-lasting wear for the modern wardrobe.'}</p>
+            </div>
+            
+            <div className="group bg-white p-8 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center text-center transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-[#BA9B74]/10">
+              <div className="bg-[#F7F5F0] p-5 rounded-full text-[#BA9B74] mb-6 group-hover:scale-110 group-hover:-rotate-12 group-hover:bg-[#BA9B74] group-hover:text-white transition-all duration-500">
+                <Award className="h-8 w-8" strokeWidth={1.5} />
+              </div>
+              <h3 className="font-extrabold text-gray-900 tracking-widest uppercase text-sm mb-3">{settings?.feature_3_title || 'Global Export'}</h3>
+              <p className="text-[15px] text-gray-500 leading-relaxed max-w-xs">{settings?.feature_3_desc || 'Delivering manufacturing excellence worldwide.'}</p>
+            </div>
+
+            <div className="group bg-white p-8 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center text-center transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:shadow-[#BA9B74]/10">
+              <div className="bg-[#F7F5F0] p-5 rounded-full text-[#BA9B74] mb-6 group-hover:scale-110 group-hover:rotate-12 group-hover:bg-[#BA9B74] group-hover:text-white transition-all duration-500">
+                <Gem className="h-8 w-8" strokeWidth={1.5} />
+              </div>
+              <h3 className="font-extrabold text-gray-900 tracking-widest uppercase text-sm mb-3">Custom Tailoring</h3>
+              <p className="text-[15px] text-gray-500 leading-relaxed max-w-xs">Bespoke manufacturing tailored perfectly to your requirements.</p>
             </div>
           </div>
         </div>
       </section>
+
+      {/* Sale Banner */}
+      {saleBanner && (
+        <section className="bg-ink relative overflow-hidden text-white py-16">
+          {saleBanner.banner_image_url && (
+            <div className="absolute inset-0 z-0">
+              <img src={assetUrl(saleBanner.banner_image_url)} alt="Sale Banner" className="w-full h-full object-cover opacity-30" />
+            </div>
+          )}
+          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
+              {saleBanner.banner_title || saleBanner.name}
+            </h2>
+            <p className="text-lg text-gray-300 max-w-2xl mx-auto mb-8">
+              {saleBanner.banner_subtitle || `Save ${saleBanner.discount_type === 'percentage' ? `${saleBanner.discount_value}%` : `$${saleBanner.discount_value}`} on selected items!`}
+            </p>
+            <Link to="/products" className="inline-block bg-[#BA9B74] text-white font-bold px-8 py-4 rounded-full tracking-widest text-sm hover:bg-white hover:text-ink transition-colors shadow-lg">
+              SHOP THE SALE
+            </Link>
+          </div>
+        </section>
+      )}
 
       {/* Categories */}
       <section className="py-24 bg-white">
@@ -77,8 +232,15 @@ const UserHome = () => {
             <p className="text-muted">Find your fit across our collections.</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {categories.filter(c => !c.parent_id && c.show_on_home).map((c, idx) => (
+            {categories.filter(c => !c.parent_id && c.show_on_home).map((c, idx) => {
+              const catSale = getCategorySale(c.id);
+              return (
               <Link key={c.id} to={`/products?category=${c.slug}`} className="group relative h-80 rounded-[2rem] overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-accent/20 transition-all duration-500 bg-gray-900">
+                {catSale && (
+                  <span className="absolute top-4 left-4 z-20 bg-[#BA9B74] text-white text-[10px] font-bold tracking-widest uppercase px-4 py-1.5 rounded-full shadow-md">
+                    {catSale.discount_type === 'percentage' ? `${catSale.discount_value}% OFF` : `SALE`}
+                  </span>
+                )}
                 <img
                   src={c.bg_image ? assetUrl(c.bg_image) : catImg[c.slug] || `https://images.unsplash.com/photo-1445205170230-053b83016050?w=800&h=1000&fit=crop`}
                   alt={c.name}
@@ -96,7 +258,7 @@ const UserHome = () => {
                   </div>
                 </div>
               </Link>
-            ))}
+            )})}
           </div>
         </div>
       </section>
@@ -208,6 +370,49 @@ const UserHome = () => {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Inquiry / Request a Quote */}
+      <section className="py-24 bg-white relative overflow-hidden">
+        <div className="absolute inset-0 bg-[#F7F5F0]/50 z-0 skew-y-3 transform origin-bottom-left" />
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-12">
+            <span className="text-[#BA9B74] font-semibold tracking-[0.2em] text-xs uppercase">B2B & Custom Orders</span>
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 mt-2 mb-4">Request a Quote</h2>
+            <p className="text-gray-500">Interested in bulk orders, specific customizations, or high-volume exports? Reach out to us directly for tailored pricing.</p>
+          </div>
+          
+          <div className="bg-white p-8 md:p-12 rounded-3xl shadow-xl border border-gray-100">
+            <form onSubmit={handleInquiry} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Name / Company Name</label>
+                  <input required type="text" value={inquiry.name} onChange={e => setInquiry({...inquiry, name: e.target.value})} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-[#BA9B74] focus:border-transparent transition" placeholder="Your Name" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                  <input required type="email" value={inquiry.email} onChange={e => setInquiry({...inquiry, email: e.target.value})} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-[#BA9B74] focus:border-transparent transition" placeholder="you@company.com" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Order Details & Requirements</label>
+                <textarea required rows="4" value={inquiry.message} onChange={e => setInquiry({...inquiry, message: e.target.value})} className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-[#BA9B74] focus:border-transparent transition resize-none" placeholder="Please specify fabrics, quantity, timelines, etc..." />
+              </div>
+              
+              <div className="flex flex-col items-center">
+                <button 
+                  type="submit" 
+                  disabled={inquiryStatus === 'sending'}
+                  className="bg-[#BA9B74] text-white px-10 py-4 rounded-full font-bold tracking-widest text-sm hover:bg-[#A68A61] transition shadow-lg w-full md:w-auto disabled:opacity-70"
+                >
+                  {inquiryStatus === 'sending' ? 'SENDING INQUIRY...' : 'SUBMIT INQUIRY'}
+                </button>
+                {inquiryStatus === 'success' && <p className="text-green-600 mt-4 text-sm font-medium">Your inquiry has been received. We will get back to you shortly.</p>}
+                {inquiryStatus === 'error' && <p className="text-red-500 mt-4 text-sm font-medium">There was an error sending your inquiry. Please try again.</p>}
+              </div>
+            </form>
           </div>
         </div>
       </section>

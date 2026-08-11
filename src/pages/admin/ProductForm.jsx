@@ -7,7 +7,7 @@ import { useAdminTitle } from '../../components/admin/useAdminTitle';
 
 const empty = {
   name: '', description: '', price: '', sku: '', material: '',
-  sizes: '', colors: '', stock: 0, main_category_id: '', sub_category_id: '', featured: false, active: true, size_guide_id: ''
+  sizes: '', colors: '', stock: 0, main_category_id: '', sub_category_id: '', featured: false, show_in_hero: false, active: true, size_guide_id: ''
 };
 
 const ProductForm = () => {
@@ -61,6 +61,7 @@ const ProductForm = () => {
             main_category_id: mainCatId,
             sub_category_id: subCatId,
             featured: !!p?.featured,
+            show_in_hero: !!p?.show_in_hero,
             active: !!p?.active,
             size_guide_id: p?.size_guide_id || ''
           });
@@ -246,6 +247,9 @@ const ProductForm = () => {
           <div className="flex gap-6 pt-2">
             <label className="flex items-center gap-2 text-sm text-gray-700">
               <input type="checkbox" checked={form.featured} onChange={set('featured')} className="rounded" /> Featured
+            </label>
+            <label className="flex items-center gap-2 text-sm text-gray-700">
+              <input type="checkbox" checked={form.show_in_hero} onChange={set('show_in_hero')} className="rounded" /> Show in Hero
             </label>
             <label className="flex items-center gap-2 text-sm text-gray-700">
               <input type="checkbox" checked={form.active} onChange={set('active')} className="rounded" /> Active (visible in store)

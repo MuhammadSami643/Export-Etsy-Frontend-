@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Save, Upload } from 'lucide-react';
+import { Save, Upload, Plus, Trash2 } from 'lucide-react';
 import { settingsApi, authApi } from '../../api';
 import { useAdminTitle } from '../../components/admin/useAdminTitle';
 import Seo from '../../components/Seo';
@@ -24,13 +24,7 @@ const AdminSettings = () => {
     instagram: '',
     youtube: '',
     brochure_url: '',
-    hero_bg: '',
-    hero_bg_file: null,
-    hero_title: '',
-    hero_highlighted_text: '',
-    hero_subtitle: '',
-    cta_text: '',
-    cta_link: '',
+    social_links: [],
   });
   const [pwdForm, setPwdForm] = useState({ current_password: '', new_password: '' });
   const [saving, setSaving] = useState(false);
@@ -66,13 +60,7 @@ const AdminSettings = () => {
           instagram: s.instagram || '',
           youtube: s.youtube || '',
           brochure_url: s.brochure_url || '',
-          hero_bg: s.hero_bg || '',
-          hero_bg_file: null,
-          hero_title: s.hero_title || '',
-          hero_highlighted_text: s.hero_highlighted_text || '',
-          hero_subtitle: s.hero_subtitle || '',
-          cta_text: s.cta_text || '',
-          cta_link: s.cta_link || '',
+          social_links: typeof s.social_links === 'string' ? JSON.parse(s.social_links) : (s.social_links || []),
         }));
       })
       .catch(() => {});
@@ -90,7 +78,9 @@ const AdminSettings = () => {
     try {
       const fd = new FormData();
       Object.entries(form).forEach(([key, value]) => {
-        if (value instanceof File) {
+        if (key === 'social_links') {
+          fd.append(key, JSON.stringify(value));
+        } else if (value instanceof File) {
           if (value.size > 0) fd.append(key, value);
         } else if (value !== null && value !== undefined) {
           fd.append(key, value);
@@ -101,10 +91,8 @@ const AdminSettings = () => {
         ...f,
         app_logo: updated.app_logo || '',
         app_favicon: updated.app_favicon || '',
-        hero_bg: updated.hero_bg || '',
         app_logo_file: null,
         app_favicon_file: null,
-        hero_bg_file: null,
       }));
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
@@ -179,11 +167,57 @@ const AdminSettings = () => {
         </Card>
 
         {/* Social Media */}
-        <Card title="Social Media">
-          <F label="Facebook URL"><input value={form.facebook} onChange={setField('facebook')} className={input} /></F>
-          <F label="LinkedIn URL"><input value={form.linkedin} onChange={setField('linkedin')} className={input} /></F>
-          <F label="Instagram URL"><input value={form.instagram} onChange={setField('instagram')} className={input} /></F>
-          <F label="YouTube URL"><input value={form.youtube} onChange={setField('youtube')} className={input} /></F>
+        <Card title="Social Media (Dynamic Links)">
+          <div className="space-y-4">
+            {form.social_links.map((link, idx) => (
+              <div key={idx} className="flex gap-4 items-start bg-gray-50 p-4 rounded-xl border border-gray-100">
+                <div className="flex-1 space-y-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1">Platform / Label (e.g. Instagram, FB)</label>
+                    <input 
+                      value={link.label} 
+                      onChange={e => {
+                        const newLinks = [...form.social_links];
+                        newLinks[idx].label = e.target.value;
+                        setForm({...form, social_links: newLinks});
+                      }} 
+                      className={input} 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-1">URL</label>
+                    <input 
+                      value={link.url} 
+                      onChange={e => {
+                        const newLinks = [...form.social_links];
+                        newLinks[idx].url = e.target.value;
+                        setForm({...form, social_links: newLinks});
+                      }} 
+                      className={input} 
+                    />
+                  </div>
+                </div>
+                <button 
+                  type="button" 
+                  onClick={() => {
+                    const newLinks = form.social_links.filter((_, i) => i !== idx);
+                    setForm({...form, social_links: newLinks});
+                  }}
+                  className="mt-6 p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                >
+                  <Trash2 className="h-5 w-5" />
+                </button>
+              </div>
+            ))}
+            
+            <button 
+              type="button" 
+              onClick={() => setForm({...form, social_links: [...form.social_links, { label: '', url: '' }]})}
+              className="inline-flex items-center gap-2 text-[#BA9B74] font-medium hover:text-[#997F64] transition-colors"
+            >
+              <Plus className="h-4 w-4" /> Add Social Link
+            </button>
+          </div>
         </Card>
 
         {/* Other */}
@@ -192,34 +226,7 @@ const AdminSettings = () => {
           <F label="Brochure Download URL"><input value={form.brochure_url} onChange={setField('brochure_url')} className={input} /></F>
         </Card>
 
-        {/* Hero Background */}
-        <Card title="Hero Section">
-          <F label="Hero Background Image URL"><input value={form.hero_bg} onChange={setField('hero_bg')} className={input} placeholder="https://..." /></F>
-          <F label="Upload Hero Background Image">
-            <input type="file" onChange={setFile('hero_bg_file')} className={input} accept="image/*" />
-          </F>
-          {form.hero_bg && (
-            <div className="mt-2">
-              <img src={form.hero_bg} alt="Hero bg" className="h-20 w-full object-cover rounded-lg border border-gray-200" />
-            </div>
-          )}
-          <F label="Hero Title">
-            <textarea rows={3} value={form.hero_title} onChange={setField('hero_title')} className={input} placeholder="Precision Surgical{'\n'}{'{highlight}'}{'\n'}Trusted Worldwide" />
-          </F>
-          <F label="Highlighted Green Text (Optional)">
-            <input type="text" value={form.hero_highlighted_text} onChange={setField('hero_highlighted_text')} className={input} placeholder="Instruments" />
-            <p className="mt-1 text-xs text-gray-400">To place this text in the middle of your Hero Title, use the placeholder <code className="bg-gray-100 px-1 rounded">{'{highlight}'}</code> exactly where you want it.</p>
-          </F>
-          <F label="Hero Subtitle">
-            <textarea rows={3} value={form.hero_subtitle} onChange={setField('hero_subtitle')} className={input} placeholder="Manufacturing excellence with international quality standards..." />
-          </F>
-          <F label="CTA Button Text">
-            <input value={form.cta_text} onChange={setField('cta_text')} className={input} placeholder="Shop the Collection" />
-          </F>
-          <F label="CTA Button Link">
-            <input value={form.cta_link} onChange={setField('cta_link')} className={input} placeholder="/products" />
-          </F>
-        </Card>
+
 
         {/* Change Password */}
         <Card title="Change Password">

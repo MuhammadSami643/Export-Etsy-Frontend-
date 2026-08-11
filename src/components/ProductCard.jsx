@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useSales } from '../context/SalesContext';
 import { money, productImage, categoryName } from '../lib/format';
 import { assetUrl } from '../api/client';
 
 const ProductCard = ({ product }) => {
   const { addToCart, cartItems } = useCart();
+  const { getProductSale } = useSales();
 
   const quickAdd = (e) => {
     e.preventDefault();
@@ -18,9 +20,12 @@ const ProductCard = ({ product }) => {
   const mainImg = (product.images || []).find((i) => i.is_main);
   const displayImage = mainImg ? assetUrl(mainImg.url) : productImage(product);
   const targetUrl = `/products/${product.slug || product.id}`;
+  
+  const saleInfo = getProductSale(product);
+  const currentPrice = saleInfo ? saleInfo.salePrice : product.price;
 
   return (
-    <div className="group flex flex-col h-full bg-white rounded-[2rem] overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.12)] hover:shadow-accent/20 border border-gray-200 shadow-sm p-2">
+    <div className="group flex flex-col h-full bg-white rounded-[2rem] overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.12)] hover:shadow-accent/20 border border-gray-200 shadow-sm p-2 relative">
       {/* Top Image Section */}
       <Link to={targetUrl} className="relative aspect-[4/5] overflow-hidden bg-gradient-to-b from-gray-50 to-gray-100 block rounded-[1.5rem]">
         <img
@@ -32,8 +37,14 @@ const ProductCard = ({ product }) => {
         {/* Subtle dark gradient on hover for better button contrast */}
         <div className="absolute inset-0 bg-gradient-to-t from-ink/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
+        {saleInfo && !soldOut && (
+          <span className="absolute top-4 left-4 bg-[#BA9B74] text-white text-[10px] font-bold tracking-widest uppercase px-4 py-1.5 rounded-full shadow-md z-10">
+            {saleInfo.discount_type === 'percentage' ? `${saleInfo.discount_value}% OFF` : `SALE`}
+          </span>
+        )}
+
         {soldOut && (
-          <span className="absolute top-4 left-4 bg-white/90 backdrop-blur-md text-ink text-[10px] font-bold tracking-widest uppercase px-4 py-1.5 rounded-full shadow-sm border border-gray-100">
+          <span className="absolute top-4 left-4 bg-white/90 backdrop-blur-md text-ink text-[10px] font-bold tracking-widest uppercase px-4 py-1.5 rounded-full shadow-sm border border-gray-100 z-10">
             Sold out
           </span>
         )}
@@ -75,7 +86,16 @@ const ProductCard = ({ product }) => {
           <Link to={targetUrl} className="hover:text-accent transition-colors flex-1">
             <h3 className="text-base font-bold text-ink line-clamp-1 group-hover:text-accent transition-colors">{product.name}</h3>
           </Link>
-          <p className="text-base font-extrabold text-ink bg-gray-50 px-3 py-1 rounded-xl whitespace-nowrap">{money(product.price)}</p>
+          <div className="flex flex-col items-end">
+            {saleInfo ? (
+              <>
+                <p className="text-base font-extrabold text-[#BA9B74] whitespace-nowrap">{money(currentPrice)}</p>
+                <p className="text-[11px] font-bold text-gray-400 line-through whitespace-nowrap">{money(product.price)}</p>
+              </>
+            ) : (
+              <p className="text-base font-extrabold text-ink bg-gray-50 px-3 py-1 rounded-xl whitespace-nowrap">{money(currentPrice)}</p>
+            )}
+          </div>
         </div>
         <p className="text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-4">{categoryName(product)}</p>
 
