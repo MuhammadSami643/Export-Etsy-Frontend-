@@ -38,7 +38,7 @@ const AdminLogin = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <span className="font-bold text-2xl tracking-[0.2em] text-white">VESTRA</span>
+          <span className="font-bold text-2xl tracking-[0.2em] text-white">Decorafy</span>
           <p className="text-gray-500 text-sm mt-2 uppercase tracking-wider">Admin Panel</p>
         </div>
         <div className="bg-gray-800/50 border border-gray-800 p-8 rounded-3xl">

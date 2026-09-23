@@ -26,7 +26,7 @@ const TermsConditions = () => {
                 <h2 className="text-xl font-bold text-ink uppercase tracking-wider text-sm">1. Acceptance of Terms</h2>
               </div>
               <p className="pl-10">
-                By accessing and placing an order with Vestra, you confirm that you are in agreement with and bound by the terms of service contained in the Terms & Conditions outlined below. These terms apply to the entire website and any email or other type of communication between you and Vestra.
+                By accessing and placing an order with Decorafy, you confirm that you are in agreement with and bound by the terms of service contained in the Terms & Conditions outlined below. These terms apply to the entire website and any email or other type of communication between you and Decorafy.
               </p>
             </section>
 
@@ -55,7 +55,7 @@ const TermsConditions = () => {
                 <h2 className="text-xl font-bold text-ink uppercase tracking-wider text-sm">3. Intellectual Property</h2>
               </div>
               <p className="pl-10">
-                The website and its entire contents, features, and functionality (including but not limited to all information, software, text, displays, images, video, and audio, and the design, selection, and arrangement thereof), are owned by Vestra and are protected by international copyright, trademark, patent, trade secret, and other intellectual property or proprietary rights laws.
+                The website and its entire contents, features, and functionality (including but not limited to all information, software, text, displays, images, video, and audio, and the design, selection, and arrangement thereof), are owned by Decorafy and are protected by international copyright, trademark, patent, trade secret, and other intellectual property or proprietary rights laws.
               </p>
             </section>
 
@@ -63,7 +63,7 @@ const TermsConditions = () => {
               <h2 className="text-lg font-bold text-ink mb-4 uppercase tracking-wider text-sm">Questions about our Terms?</h2>
               <p className="mb-6">If you need clarification regarding any of these terms before making a purchase, please reach out to us.</p>
               <ul className="space-y-3 font-medium text-ink text-sm">
-                <li><span className="text-muted w-20 inline-block uppercase tracking-wider text-xs">Email</span> <a href="mailto:support@vestra.com" className="hover:text-accent transition-colors">support@vestra.com</a></li>
+                <li><span className="text-muted w-20 inline-block uppercase tracking-wider text-xs">Email</span> <a href="mailto:support@decorafy.shop" className="hover:text-accent transition-colors">support@decorafy.shop</a></li>
                 <li><span className="text-muted w-20 inline-block uppercase tracking-wider text-xs">Phone</span> <a href="tel:+923000000000" className="hover:text-accent transition-colors">+92 300 0000000</a></li>
               </ul>
             </section>

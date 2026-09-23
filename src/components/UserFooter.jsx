@@ -4,7 +4,7 @@ import { settingsApi, categoryApi } from '../api';
 
 const UserFooter = () => {
   const [logoUrl, setLogoUrl] = useState(null);
-  const [companyName, setCompanyName] = useState('VESTRA');
+  const [companyName, setCompanyName] = useState('Decorafy');
   const [socials, setSocials] = useState([]);
   const [categories, setCategories] = useState([]);
 
@@ -78,7 +78,7 @@ const UserFooter = () => {
 
         <div className="pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-xs text-center md:text-left mb-4 md:mb-0">
-            &copy; {new Date().getFullYear()} VESTRA Global Apparel. All rights reserved.
+            &copy; {new Date().getFullYear()} Decorafy Walls. All rights reserved.
           </p>
           <div className="flex space-x-4">
             <Link to="/privacy" className="text-gray-400 text-xs hover:text-accent transition-colors">Privacy Policy</Link>

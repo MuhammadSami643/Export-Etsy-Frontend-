@@ -38,7 +38,7 @@ const UserLogin = () => {
           {mode === 'login' ? 'Welcome back' : 'Create an account'}
         </h1>
         <p className="text-muted text-sm text-center mb-8">
-          {mode === 'login' ? 'Sign in to continue' : 'Join VESTRA to track your orders'}
+          {mode === 'login' ? 'Sign in to continue' : 'Join Decorafy to track your orders'}
         </p>
 
         {error && <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">{error}</div>}

@@ -53,7 +53,7 @@ const Contact = () => {
                 <Mail className="h-6 w-6 text-accent shrink-0" />
                 <div>
                   <h3 className="font-semibold text-ink uppercase tracking-wider text-sm mb-1">Email Us</h3>
-                  <a href="mailto:support@vestra.com" className="text-muted hover:text-accent transition-colors">support@vestra.com</a>
+                  <a href="mailto:support@decorafy.shop" className="text-muted hover:text-accent transition-colors">support@decorafy.shop</a>
                 </div>
               </div>
               
@@ -69,7 +69,7 @@ const Contact = () => {
                 <MapPin className="h-6 w-6 text-accent shrink-0" />
                 <div>
                   <h3 className="font-semibold text-ink uppercase tracking-wider text-sm mb-1">Headquarters</h3>
-                  <p className="text-muted leading-relaxed">Vestra Fashion Avenue<br/>Lahore, Pakistan</p>
+                  <p className="text-muted leading-relaxed">Decorafy Walls<br/>Lahore, Pakistan</p>
                 </div>
               </div>
 

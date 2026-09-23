@@ -14,7 +14,7 @@ const UserNavbar = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [categories, setCategories] = useState([]);
   const [logoUrl, setLogoUrl] = useState(null);
-  const [companyName, setCompanyName] = useState('VESTRA');
+  const [companyName, setCompanyName] = useState('Decorafy');
   const navigate = useNavigate();
 
   useEffect(() => {

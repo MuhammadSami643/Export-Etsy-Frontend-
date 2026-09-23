@@ -41,7 +41,7 @@ const AdminCategories = () => {
   useAdminTitle('Categories');
 
   const topCategories = categories.filter(c => !c.parent_id);
-  const subCategories = categories.filter(c => c.parent_id);
+  const subCategories = categories.flatMap(c => c.subcategories || []);
 
   const renderTable = (list, title, isSub) => (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-6">

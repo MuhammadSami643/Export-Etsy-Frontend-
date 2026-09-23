@@ -26,7 +26,7 @@ const PrivacyPolicy = () => {
                 <h2 className="text-xl font-bold text-ink uppercase tracking-wider text-sm">1. Introduction</h2>
               </div>
               <p className="pl-10">
-                Welcome to Vestra ("we," "our," or "us"). We respect your privacy and are deeply committed to protecting your personal data. 
+                Welcome to Decorafy ("we," "our," or "us"). We respect your privacy and are deeply committed to protecting your personal data. 
                 This Privacy Policy outlines the types of information we collect, how it is used, and the steps we take to safeguard it when you 
                 visit our website or purchase our premium apparel.
               </p>
@@ -95,7 +95,7 @@ const PrivacyPolicy = () => {
               <h2 className="text-lg font-bold text-ink mb-4 uppercase tracking-wider text-sm">Contacting Us Regarding Privacy</h2>
               <p className="mb-6">If you have any questions or concerns regarding this Privacy Policy or your data, our dedicated support team is here to help.</p>
               <ul className="space-y-3 font-medium text-ink text-sm">
-                <li><span className="text-muted w-20 inline-block uppercase tracking-wider text-xs">Email</span> <a href="mailto:support@vestra.com" className="hover:text-accent transition-colors">support@vestra.com</a></li>
+                <li><span className="text-muted w-20 inline-block uppercase tracking-wider text-xs">Email</span> <a href="mailto:support@decorafy.shop" className="hover:text-accent transition-colors">support@decorafy.shop</a></li>
                 <li><span className="text-muted w-20 inline-block uppercase tracking-wider text-xs">Phone</span> <a href="tel:+923000000000" className="hover:text-accent transition-colors">+92 300 0000000</a></li>
               </ul>
             </section>

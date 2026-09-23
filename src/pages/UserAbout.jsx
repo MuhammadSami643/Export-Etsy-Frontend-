@@ -6,7 +6,7 @@ const About = () => {
     <div className="bg-white min-h-screen pt-12 pb-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-ink mb-4">About VESTRA</h1>
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-ink mb-4">About Decorafy</h1>
           <p className="text-lg text-muted max-w-2xl mx-auto">
             Premium clothing exported worldwide. We bridge craftsmanship with global demand.
           </p>
@@ -30,7 +30,7 @@ const About = () => {
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl font-bold tracking-tight text-ink mb-6">Our Story</h2>
           <p className="text-gray-600 leading-relaxed mb-6">
-            Founded with a focus on clothing export, VESTRA connects manufacturers with retailers and consumers around the world. We handle sourcing, quality control, documentation and shipping so our partners can focus on growing their business.
+            Founded with a focus on clothing export, Decorafy connects manufacturers with retailers and consumers around the world. We handle sourcing, quality control, documentation and shipping so our partners can focus on growing their business.
           </p>
           <p className="text-gray-600 leading-relaxed">
             From bulk wholesale orders to single-item retail, we maintain the same commitment to fabric quality, fit, and finish. Our collection includes shirts, denim, knitwear, dresses, and accessories built to international standards.

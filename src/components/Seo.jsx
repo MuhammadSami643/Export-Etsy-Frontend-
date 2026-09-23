@@ -1,10 +1,17 @@
 import { useEffect } from 'react';
 
+// Build a full browser title like: "Decorafy Walls — Products"
+const buildTitle = (pageTitle) => {
+  const brand = window.__COMPANY_NAME__;
+  if (!pageTitle) return brand || 'Store';
+  if (!brand)    return pageTitle;
+  return `${brand} — ${pageTitle}`;
+};
+
 const Seo = ({ title, description, keywords }) => {
   useEffect(() => {
-    if (title) {
-      document.title = title;
-    }
+    document.title = buildTitle(title);
+
     if (description) {
       let meta = document.querySelector('meta[name="description"]');
       if (!meta) {
@@ -24,7 +31,7 @@ const Seo = ({ title, description, keywords }) => {
       meta.content = keywords;
     }
     return () => {
-      if (title) document.title = 'VESTRA — Global Apparel';
+      document.title = window.__DEFAULT_TITLE__ || window.__COMPANY_NAME__ || 'Store';
     };
   }, [title, description, keywords]);
 

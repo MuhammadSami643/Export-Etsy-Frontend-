@@ -38,7 +38,7 @@ const AdminLayout = ({ children }) => {
       <div className="min-h-screen bg-gray-100 flex transition-colors duration-300">
         <aside className="w-64 bg-gray-900 text-gray-300 flex flex-col fixed inset-y-0 transition-colors duration-300 z-20">
           <div className="h-20 flex items-center px-6 border-b border-gray-800">
-            <span className="font-bold text-xl tracking-[0.2em] text-white">VESTRA</span>
+            <span className="font-bold text-xl tracking-[0.2em] text-white">Decorafy</span>
             <span className="ml-2 text-xs text-gray-500 uppercase tracking-wider">Admin</span>
           </div>
           <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto minimal-scrollbar">

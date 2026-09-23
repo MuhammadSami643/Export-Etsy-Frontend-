@@ -76,7 +76,7 @@ const ReturnRefund = () => {
               <div>
                 <h4 className="font-bold text-ink uppercase tracking-wider text-xs mb-2">Need Help?</h4>
                 <p className="text-sm text-muted">
-                  Our customer service team is ready to assist you with your return. Contact us at <a href="mailto:support@vestra.com" className="font-semibold text-ink hover:text-accent transition-colors">support@vestra.com</a>.
+                  Our customer service team is ready to assist you with your return. Contact us at <a href="mailto:support@decorafy.shop" className="font-semibold text-ink hover:text-accent transition-colors">support@decorafy.shop</a>.
                 </p>
               </div>
             </div>

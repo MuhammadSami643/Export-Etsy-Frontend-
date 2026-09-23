@@ -31,7 +31,7 @@ const UserHome = () => {
     productApi.list({ featured: true, limit: 4 }).then((d) => setFeatured(d.products)).catch(() => { });
     productApi.list({ show_in_hero: true, limit: 5 }).then((d) => setHeroProducts(d.products)).catch(() => { });
     categoryApi.listWithSubs().then(setCategories).catch(() => { });
-    settingsApi.get().then(setSettings).catch(() => { });
+    settingsApi.getPublic().then(setSettings).catch(() => { });
     apiFetch('/testimonials').then(setTestimonials).catch(() => { });
   }, []);
 

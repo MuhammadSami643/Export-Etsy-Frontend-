@@ -18,6 +18,12 @@ function App() {
   useEffect(() => {
     import('./api').then(({ settingsApi }) => {
       settingsApi.getPublic().then(s => {
+        if (s?.company_name) {
+          window.__COMPANY_NAME__ = s.company_name;
+          const title = s.tagline ? `${s.company_name} — ${s.tagline}` : s.company_name;
+          document.title = title;
+          window.__DEFAULT_TITLE__ = title;
+        }
         if (s?.app_favicon) {
           let link = document.querySelector("link[rel~='icon']");
           if (!link) {
